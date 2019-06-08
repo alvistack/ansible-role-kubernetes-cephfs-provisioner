@@ -1,0 +1,188 @@
+---
+
+# (c) Wong Hoi Sing Edison <hswong3i@pantarei-design.com>
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cephfs-provisioner
+  labels:
+    app.kubernetes.io/name: cephfs-provisioner
+    app.kubernetes.io/part-of: cephfs-provisioner
+    addonmanager.kubernetes.io/mode: Reconcile
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cephfs-provisioner
+  namespace: cephfs-provisioner
+  labels:
+    app.kubernetes.io/name: cephfs-provisioner
+    app.kubernetes.io/part-of: cephfs-provisioner
+    addonmanager.kubernetes.io/mode: Reconcile
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: cephfs-provisioner
+  namespace: cephfs-provisioner
+  labels:
+    app.kubernetes.io/name: cephfs-provisioner
+    app.kubernetes.io/part-of: cephfs-provisioner
+    addonmanager.kubernetes.io/mode: Reconcile
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["create", "get", "delete"]
+  - apiGroups: [""]
+    resources: ["endpoints"]
+    verbs: ["get", "list", "watch", "create", "update", "patch"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: cephfs-provisioner
+  namespace: cephfs-provisioner
+  labels:
+    app.kubernetes.io/name: cephfs-provisioner
+    app.kubernetes.io/part-of: cephfs-provisioner
+    addonmanager.kubernetes.io/mode: Reconcile
+rules:
+  - apiGroups: [""]
+    resources: ["persistentvolumes"]
+    verbs: ["get", "list", "watch", "create", "delete"]
+  - apiGroups: [""]
+    resources: ["persistentvolumeclaims"]
+    verbs: ["get", "list", "watch", "update"]
+  - apiGroups: ["storage.k8s.io"]
+    resources: ["storageclasses"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["create", "update", "patch"]
+  - apiGroups: [""]
+    resources: ["services"]
+    resourceNames: ["kube-dns","coredns"]
+    verbs: ["list", "get"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: cephfs-provisioner
+  namespace: cephfs-provisioner
+  labels:
+    app.kubernetes.io/name: cephfs-provisioner
+    app.kubernetes.io/part-of: cephfs-provisioner
+    addonmanager.kubernetes.io/mode: EnsureExists
+subjects:
+  - kind: ServiceAccount
+    name: cephfs-provisioner
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: cephfs-provisioner
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: cephfs-provisioner
+  labels:
+    app.kubernetes.io/name: cephfs-provisioner
+    app.kubernetes.io/part-of: cephfs-provisioner
+    addonmanager.kubernetes.io/mode: EnsureExists
+subjects:
+  - kind: ServiceAccount
+    name: cephfs-provisioner
+    namespace: cephfs-provisioner
+roleRef:
+  kind: ClusterRole
+  name: cephfs-provisioner
+  apiGroup: rbac.authorization.k8s.io
+
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: cephfs
+  labels:
+    app.kubernetes.io/name: cephfs-provisioner
+    app.kubernetes.io/part-of: cephfs-provisioner
+    addonmanager.kubernetes.io/mode: Reconcile
+provisioner: ceph.com/cephfs
+parameters:
+  cluster: {{ cephfs_provisioner_cluster }}
+  monitors: {{ cephfs_provisioner_monitors }}
+  adminId: {{ cephfs_provisioner_admin_id }}
+  adminSecretName: cephfs-provisioner
+  adminSecretNamespace: cephfs-provisioner
+  claimRoot: {{ cephfs_provisioner_claim_root }}
+  deterministicNames: "{{ cephfs_provisioner_deterministic_names | bool | lower }}"
+
+---
+kind: Secret
+apiVersion: v1
+metadata:
+  name: cephfs-provisioner
+  namespace: cephfs-provisioner
+  labels:
+    app.kubernetes.io/name: cephfs-provisioner
+    app.kubernetes.io/part-of: cephfs-provisioner
+    addonmanager.kubernetes.io/mode: Reconcile
+type: Opaque
+data:
+  secret: {{ cephfs_provisioner_admin_secret | b64encode }}
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cephfs-provisioner
+  namespace: cephfs-provisioner
+  labels:
+    app.kubernetes.io/name: cephfs-provisioner
+    app.kubernetes.io/part-of: cephfs-provisioner
+    addonmanager.kubernetes.io/mode: Reconcile
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: cephfs-provisioner
+      app.kubernetes.io/part-of: cephfs-provisioner
+      addonmanager.kubernetes.io/mode: Reconcile
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: cephfs-provisioner
+        app.kubernetes.io/part-of: cephfs-provisioner
+        addonmanager.kubernetes.io/mode: Reconcile
+    spec:
+      serviceAccount: cephfs-provisioner
+      containers:
+        - name: cephfs-provisioner
+          image: {{ cephfs_provisioner_image_repository }}/cephfs-provisioner:{{ cephfs_provisioner_version }}
+          env:
+            - name: PROVISIONER_NAME
+              value: ceph.com/cephfs
+            - name: PROVISIONER_SECRET_NAMESPACE
+              value: cephfs-provisioner
+          command:
+            - "/usr/local/bin/cephfs-provisioner"
+          args:
+            - "-id=cephfs-provisioner-1"

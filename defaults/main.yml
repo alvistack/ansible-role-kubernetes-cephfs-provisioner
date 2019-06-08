@@ -1,0 +1,42 @@
+---
+
+# (c) Wong Hoi Sing Edison <hswong3i@pantarei-design.com>
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# cephfs-provisioner version.
+cephfs_provisioner_version: "v2.1.0-k8s1.11"
+
+# ImageRepository sets the container registry to pull images from.
+cephfs_provisioner_image_repository: "quay.io/external_storage"
+
+# Ceph cluster name.
+cephfs_provisioner_cluster: "ceph"
+
+# Ceph monitors.
+cephfs_provisioner_monitors: >-
+  {%- for host in ansible_play_hosts -%}
+  {{ hostvars[host]['ansible_default_ipv4']['address'] }}:6789,
+  {%- endfor -%}
+
+# Ceph admin id.
+cephfs_provisioner_admin_id: "admin"
+
+# Ceph admin secret.
+cephfs_provisioner_admin_secret: "AQCZdWZc/D8UNxAAGxQYkcfCR0lyvYOyeLWhTg=="
+
+# CephFS PVC root (a.k.a. prefix).
+cephfs_provisioner_claim_root: "/volumes"
+
+# Create CephFS folder in deterministic name, or random with UUID.
+cephfs_provisioner_deterministic_names: true
