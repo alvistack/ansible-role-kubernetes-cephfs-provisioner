@@ -32,6 +32,11 @@
     - role: kubernetes-addon-manager
     - role: kubernetes-flannel
     - role: kubernetes-cephfs-provisioner
+      cephfs_provisioner_monitors: >-
+        {%- for host in ansible_play_hosts -%}
+        {{ hostvars[host]['ansible_default_ipv4']['address'] }}:6789,
+        {%- endfor -%}
+      cephfs_provisioner_admin_secret: "AQCZdWZc/D8UNxAAGxQYkcfCR0lyvYOyeLWhTg=="
 
   post_tasks:
     - name: kubectl version
