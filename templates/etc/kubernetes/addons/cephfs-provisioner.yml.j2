@@ -93,13 +93,14 @@ metadata:
     app.kubernetes.io/name: cephfs-provisioner
     app.kubernetes.io/part-of: cephfs-provisioner
     addonmanager.kubernetes.io/mode: EnsureExists
+roleRef:
+  kind: Role
+  name: cephfs-provisioner
+  apiGroup: rbac.authorization.k8s.io
 subjects:
   - kind: ServiceAccount
     name: cephfs-provisioner
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: Role
-  name: cephfs-provisioner
+    namespace: cephfs-provisioner
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -110,14 +111,14 @@ metadata:
     app.kubernetes.io/name: cephfs-provisioner
     app.kubernetes.io/part-of: cephfs-provisioner
     addonmanager.kubernetes.io/mode: EnsureExists
-subjects:
-  - kind: ServiceAccount
-    name: cephfs-provisioner
-    namespace: cephfs-provisioner
 roleRef:
   kind: ClusterRole
   name: cephfs-provisioner
   apiGroup: rbac.authorization.k8s.io
+subjects:
+  - kind: ServiceAccount
+    name: cephfs-provisioner
+    namespace: cephfs-provisioner
 
 ---
 apiVersion: storage.k8s.io/v1
@@ -133,16 +134,16 @@ parameters:
   cluster: {{ cephfs_provisioner_cluster }}
   monitors: {{ cephfs_provisioner_monitors }}
   adminId: {{ cephfs_provisioner_admin_id }}
-  adminSecretName: cephfs-provisioner
+  adminSecretName: client-admin
   adminSecretNamespace: cephfs-provisioner
   claimRoot: {{ cephfs_provisioner_claim_root }}
   deterministicNames: "{{ cephfs_provisioner_deterministic_names | bool | lower }}"
 
 ---
-kind: Secret
 apiVersion: v1
+kind: Secret
 metadata:
-  name: cephfs-provisioner
+  name: client-admin
   namespace: cephfs-provisioner
   labels:
     app.kubernetes.io/name: cephfs-provisioner
