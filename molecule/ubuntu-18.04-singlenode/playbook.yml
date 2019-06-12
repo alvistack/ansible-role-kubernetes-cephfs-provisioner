@@ -44,6 +44,54 @@
     - role: ceph-mds
     - role: ceph-rgw
 
+  post_tasks:
+    - name: ceph-volume lvm create
+      shell: |
+        set -o pipefail
+        ceph-volume lvm create \
+          --bluestore \
+          --data /dev/sdc
+      args:
+        executable: "/bin/bash"
+      changed_when: false
+      ignore_errors: true
+
+    - name: ceph osd pool create cephfs_metadata
+      shell: |
+        set -o pipefail
+        ceph osd pool create cephfs_metadata 32 32
+        ceph osd pool set cephfs_metadata size 1
+        ceph osd pool set cephfs_metadata min_size 1
+      args:
+        executable: "/bin/bash"
+      when: ansible_hostname == ansible_play_hosts[0]
+      changed_when: false
+      ignore_errors: true
+
+    - name: ceph osd pool create cephfs_data
+      shell: |
+        set -o pipefail
+        ceph osd pool create cephfs_data 128 128
+        ceph osd pool set cephfs_data size 1
+        ceph osd pool set cephfs_data min_size 1
+      args:
+        executable: "/bin/bash"
+      when: ansible_hostname == ansible_play_hosts[0]
+      changed_when: false
+      ignore_errors: true
+
+    - name: ceph fs new cephfs
+      shell: |
+        set -o pipefail
+        ceph fs new cephfs cephfs_metadata cephfs_data
+        ceph fs set cephfs standby_count_wanted 0
+        ceph fs set cephfs max_mds 1
+      args:
+        executable: "/bin/bash"
+      when: ansible_hostname == ansible_play_hosts[0]
+      changed_when: false
+      ignore_errors: true
+
 - hosts: kube-master
   remote_user: root
   become: true
@@ -74,3 +122,20 @@
       command: kubectl version
       register: result
       changed_when: result is not succeeded
+
+    - name: create pvc
+      k8s:
+        state: "present"
+        definition:
+          apiVersion: v1
+          kind: PersistentVolumeClaim
+          metadata:
+            name: cephfs
+            namespace: default
+          spec:
+            storageClassName: cephfs
+            accessModes:
+              - ReadWriteMany
+            resources:
+              requests:
+                storage: 100Mi
