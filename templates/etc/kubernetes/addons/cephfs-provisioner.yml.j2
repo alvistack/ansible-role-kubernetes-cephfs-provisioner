@@ -140,8 +140,8 @@ parameters:
   deterministicNames: "{{ cephfs_provisioner_deterministic_names | bool | lower }}"
 
 ---
-kind: Secret
 apiVersion: v1
+kind: Secret
 metadata:
   name: client-admin
   namespace: cephfs-provisioner
