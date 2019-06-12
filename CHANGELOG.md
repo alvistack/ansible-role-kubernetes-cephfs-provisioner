@@ -1,4 +1,4 @@
-# Ansible Role for CephFS Provisioner on Kubernetes
+# Ansible Role for CephFS Volume Provisioner on Kubernetes
 
 ## 3.1.0 - TBC
 
