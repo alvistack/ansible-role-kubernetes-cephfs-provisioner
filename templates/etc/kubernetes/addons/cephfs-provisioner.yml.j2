@@ -134,7 +134,7 @@ parameters:
   cluster: {{ cephfs_provisioner_cluster }}
   monitors: {{ cephfs_provisioner_monitors }}
   adminId: {{ cephfs_provisioner_admin_id }}
-  adminSecretName: cephfs-provisioner
+  adminSecretName: client-admin
   adminSecretNamespace: cephfs-provisioner
   claimRoot: {{ cephfs_provisioner_claim_root }}
   deterministicNames: "{{ cephfs_provisioner_deterministic_names | bool | lower }}"
@@ -143,7 +143,7 @@ parameters:
 kind: Secret
 apiVersion: v1
 metadata:
-  name: cephfs-provisioner
+  name: client-admin
   namespace: cephfs-provisioner
   labels:
     app.kubernetes.io/name: cephfs-provisioner
