@@ -130,14 +130,10 @@ metadata:
     app.kubernetes.io/part-of: cephfs-provisioner
     addonmanager.kubernetes.io/mode: Reconcile
 provisioner: ceph.com/cephfs
+{% if cephfs_provisioner_parameters %}
 parameters:
-  cluster: {{ cephfs_provisioner_cluster }}
-  monitors: {{ cephfs_provisioner_monitors }}
-  adminId: {{ cephfs_provisioner_admin_id }}
-  adminSecretName: client-admin
-  adminSecretNamespace: cephfs-provisioner
-  claimRoot: {{ cephfs_provisioner_claim_root }}
-  deterministicNames: "{{ cephfs_provisioner_deterministic_names | bool | lower }}"
+  {{ cephfs_provisioner_parameters | to_nice_yaml(indent=2) | indent(2) }}
+{%- endif %}
 
 ---
 apiVersion: v1
