@@ -25,6 +25,20 @@ metadata:
 
 ---
 apiVersion: v1
+kind: Secret
+metadata:
+  name: cephfs-provisioner-secret
+  namespace: cephfs-provisioner
+  labels:
+    app.kubernetes.io/name: cephfs-provisioner
+    app.kubernetes.io/part-of: cephfs-provisioner
+    addonmanager.kubernetes.io/mode: Reconcile
+type: Opaque
+data:
+  secret: {{ cephfs_provisioner_admin_secret | b64encode }}
+
+---
+apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: cephfs-provisioner
@@ -136,20 +150,6 @@ parameters:
 {%- endif %}
 
 ---
-apiVersion: v1
-kind: Secret
-metadata:
-  name: client-admin
-  namespace: cephfs-provisioner
-  labels:
-    app.kubernetes.io/name: cephfs-provisioner
-    app.kubernetes.io/part-of: cephfs-provisioner
-    addonmanager.kubernetes.io/mode: Reconcile
-type: Opaque
-data:
-  secret: {{ cephfs_provisioner_admin_secret | b64encode }}
-
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -183,6 +183,6 @@ spec:
             - name: PROVISIONER_SECRET_NAMESPACE
               value: cephfs-provisioner
           command:
-            - "/usr/local/bin/cephfs-provisioner"
+            - /usr/local/bin/cephfs-provisioner
           args:
-            - "-id=cephfs-provisioner-1"
+            - -id=cephfs-provisioner-1

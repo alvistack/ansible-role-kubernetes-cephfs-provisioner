@@ -33,7 +33,7 @@ cephfs_provisioner_admin_secret: ~
 cephfs_provisioner_parameters:
   monitors: "{{ cephfs_provisioner_monitors }}"
   adminId: "{{ cephfs_provisioner_admin_id }}"
-  adminSecretName: "client-admin"
+  adminSecretName: "cephfs-provisioner-secret"
   adminSecretNamespace: "cephfs-provisioner"
   claimRoot: "/volumes"
-  deterministicNames: true
+  deterministicNames: "false"
