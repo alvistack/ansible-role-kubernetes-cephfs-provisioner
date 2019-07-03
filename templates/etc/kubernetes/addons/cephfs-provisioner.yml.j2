@@ -25,6 +25,20 @@ metadata:
 
 ---
 apiVersion: v1
+kind: Secret
+metadata:
+  name: cephfs-provisioner-secret
+  namespace: cephfs-provisioner
+  labels:
+    app.kubernetes.io/name: cephfs-provisioner
+    app.kubernetes.io/part-of: cephfs-provisioner
+    addonmanager.kubernetes.io/mode: Reconcile
+type: Opaque
+data:
+  secret: {{ cephfs_provisioner_admin_secret | b64encode }}
+
+---
+apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: cephfs-provisioner
@@ -130,28 +144,10 @@ metadata:
     app.kubernetes.io/part-of: cephfs-provisioner
     addonmanager.kubernetes.io/mode: Reconcile
 provisioner: ceph.com/cephfs
+{% if cephfs_provisioner_parameters %}
 parameters:
-  cluster: {{ cephfs_provisioner_cluster }}
-  monitors: {{ cephfs_provisioner_monitors }}
-  adminId: {{ cephfs_provisioner_admin_id }}
-  adminSecretName: client-admin
-  adminSecretNamespace: cephfs-provisioner
-  claimRoot: {{ cephfs_provisioner_claim_root }}
-  deterministicNames: "{{ cephfs_provisioner_deterministic_names | bool | lower }}"
-
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: client-admin
-  namespace: cephfs-provisioner
-  labels:
-    app.kubernetes.io/name: cephfs-provisioner
-    app.kubernetes.io/part-of: cephfs-provisioner
-    addonmanager.kubernetes.io/mode: Reconcile
-type: Opaque
-data:
-  secret: {{ cephfs_provisioner_admin_secret | b64encode }}
+  {{ cephfs_provisioner_parameters | to_nice_yaml(indent=2) | indent(2) }}
+{%- endif %}
 
 ---
 apiVersion: apps/v1
@@ -187,6 +183,6 @@ spec:
             - name: PROVISIONER_SECRET_NAMESPACE
               value: cephfs-provisioner
           command:
-            - "/usr/local/bin/cephfs-provisioner"
+            - /usr/local/bin/cephfs-provisioner
           args:
-            - "-id=cephfs-provisioner-1"
+            - -id=cephfs-provisioner-1

@@ -20,9 +20,6 @@ cephfs_provisioner_version: "v2.1.0-k8s1.11"
 # ImageRepository sets the container registry to pull images from.
 cephfs_provisioner_image_repository: "quay.io/external_storage"
 
-# Ceph cluster name.
-cephfs_provisioner_cluster: "ceph"
-
 # Ceph monitors.
 cephfs_provisioner_monitors: ~
 
@@ -32,8 +29,11 @@ cephfs_provisioner_admin_id: "admin"
 # Ceph admin secret.
 cephfs_provisioner_admin_secret: ~
 
-# CephFS PVC root (a.k.a. prefix).
-cephfs_provisioner_claim_root: "/volumes"
-
-# Create CephFS folder in deterministic name, or random with UUID.
-cephfs_provisioner_deterministic_names: true
+# StorageClass parameters.
+cephfs_provisioner_parameters:
+  monitors: "{{ cephfs_provisioner_monitors }}"
+  adminId: "{{ cephfs_provisioner_admin_id }}"
+  adminSecretName: "cephfs-provisioner-secret"
+  adminSecretNamespace: "cephfs-provisioner"
+  claimRoot: "/volumes"
+  deterministicNames: "false"
