@@ -158,6 +158,8 @@
             resources:
               requests:
                 storage: 100Mi
+      vars:
+        ansible_python_interpreter: "/usr/bin/python3"
 
     - name: create pod
       k8s:
@@ -182,3 +184,5 @@
               - name: root
                 persistentVolumeClaim:
                   claimName: root
+      vars:
+        ansible_python_interpreter: "/usr/bin/python3"
