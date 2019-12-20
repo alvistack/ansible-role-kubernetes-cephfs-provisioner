@@ -71,7 +71,6 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: cephfs-provisioner
-  namespace: cephfs-provisioner
   labels:
     app.kubernetes.io/name: cephfs-provisioner
     app.kubernetes.io/part-of: cephfs-provisioner
@@ -96,6 +95,64 @@ rules:
   - apiGroups: [""]
     resources: ["secrets"]
     verbs: ["get", "create", "delete"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: system:csi-external-attacher
+  annotations:
+    rbac.authorization.kubernetes.io/autoupdate: "true"
+  labels:
+    app.kubernetes.io/name: cephfs-provisioner
+    app.kubernetes.io/part-of: cephfs-provisioner
+    addonmanager.kubernetes.io/mode: Reconcile
+    kubernetes.io/bootstrapping: rbac-defaults
+rules:
+  - apiGroups: [""]
+    resources: ["persistentvolumes"]
+    verbs: ["get", "list", "patch", "update", "watch"]
+  - apiGroups: [""]
+    resources: ["nodes"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["storage.k8s.io"]
+    resources: ["volumeattachments"]
+    verbs: ["get", "list", "patch", "update", "watch"]
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["create", "get", "list", "patch", "update", "watch"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: system:csi-external-provisioner
+  annotations:
+    rbac.authorization.kubernetes.io/autoupdate: "true"
+  labels:
+    app.kubernetes.io/name: cephfs-provisioner
+    app.kubernetes.io/part-of: cephfs-provisioner
+    addonmanager.kubernetes.io/mode: Reconcile
+    kubernetes.io/bootstrapping: rbac-defaults
+rules:
+  - apiGroups: [""]
+    resources:["persistentvolumes"]
+    verbs: ["create", "delete", "get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["persistentvolumeclaims"]
+    verbs: ["get", "list", "patch", "update", "watch"]
+  - apiGroups: ["storage.k8s.io"]
+    resources: ["storageclasses"]
+    verbs: ["list", "watch"]
+  - apiGroups: [""]
+    resources: ["events"]
+    verbs: ["create", "get", "list", "patch", "update", "watch"]
+  - apiGroups: [""]
+    resources: ["nodes"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: ["storage.k8s.io"]
+    resources: ["csinodes"]
+    verbs: ["get", "list", "watch"]
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
