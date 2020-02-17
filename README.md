@@ -1,8 +1,8 @@
 # Ansible Role for CephFS Volume Provisioner on Kubernetes
 
-[![Travis](https://img.shields.io/travis/alvistack/ansible-role-kubernetes-cephfs-provisioner.svg)](https://travis-ci.org/alvistack/ansible-role-kubernetes-cephfs-provisioner)
-[![GitHub release](https://img.shields.io/github/release/alvistack/ansible-role-kubernetes-cephfs-provisioner.svg)](https://github.com/alvistack/ansible-role-kubernetes-cephfs-provisioner)
-[![GitHub license](https://img.shields.io/github/license/alvistack/ansible-role-kubernetes-cephfs-provisioner.svg)](https://github.com/alvistack/ansible-role-kubernetes-cephfs-provisioner/blob/master/LICENSE)
+[![Travis](https://img.shields.io/travis/alvistack/ansible-role-kubernetes_cephfs_provisioner.svg)](https://travis-ci.org/alvistack/ansible-role-kubernetes_cephfs_provisioner)
+[![GitHub release](https://img.shields.io/github/release/alvistack/ansible-role-kubernetes_cephfs_provisioner.svg)](https://github.com/alvistack/ansible-role-kubernetes_cephfs_provisioner)
+[![GitHub license](https://img.shields.io/github/license/alvistack/ansible-role-kubernetes_cephfs_provisioner.svg)](https://github.com/alvistack/ansible-role-kubernetes_cephfs_provisioner/blob/master/LICENSE)
 [![Ansible Role](https://img.shields.io/badge/galaxy-alvistack.kubernetes_cephfs_provisioner-blue.svg)](https://galaxy.ansible.com/alvistack/kubernetes_cephfs_provisioner)
 
 Ansible Role for CephFS Volume Provisioner on Kubernetes Installation.
