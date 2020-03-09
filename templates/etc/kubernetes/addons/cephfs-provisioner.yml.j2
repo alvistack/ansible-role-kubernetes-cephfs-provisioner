@@ -146,7 +146,7 @@ provisioner: ceph.com/cephfs
 {% if cephfs_provisioner_parameters %}
 parameters:
   {{ cephfs_provisioner_parameters | to_nice_yaml(indent=2) | indent(2) }}
-{% endif %}
+{%- endif %}
 
 ---
 apiVersion: apps/v1
