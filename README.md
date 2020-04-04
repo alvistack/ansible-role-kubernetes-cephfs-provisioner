@@ -5,6 +5,8 @@
 [![GitHub license](https://img.shields.io/github/license/alvistack/ansible-role-kubernetes_cephfs_provisioner.svg)](https://github.com/alvistack/ansible-role-kubernetes_cephfs_provisioner/blob/master/LICENSE)
 [![Ansible Role](https://img.shields.io/badge/galaxy-alvistack.kubernetes_cephfs_provisioner-blue.svg)](https://galaxy.ansible.com/alvistack/kubernetes_cephfs_provisioner)
 
+**[DEPRECATED] No longer recommended for Kubernetes 1.16+, use csi-cephfs instead.**
+
 Ansible Role for CephFS Volume Provisioner on Kubernetes Installation.
 
 ## Requirements
